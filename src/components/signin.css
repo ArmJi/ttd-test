@@ -1,0 +1,10 @@
+select {
+  -webkit-appearance: none;
+  border: 1px solid #D0D5DD;
+}
+option {
+  color: black;
+}
+textarea {
+  resize: none;
+}
