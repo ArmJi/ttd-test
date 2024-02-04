@@ -17,7 +17,7 @@ const SignIn = () => {
 
   const handleImageClick = () => {
     if (!urlPicture) {
-      pictureRef.current?.click();
+      pictureRef.current!.click();
     }
   };
 
