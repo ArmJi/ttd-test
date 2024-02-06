@@ -13,7 +13,7 @@ import { User } from "../type/type";
 
 const SignIn = () => {
   const [userForm, setUserForm] = useState<User>({
-    urlPicture: "",
+    url: "",
     email: "",
     password: "",
     companyName: "",
@@ -41,12 +41,12 @@ const SignIn = () => {
       ...userForm,
       address: event.target.value,
     });
-  }
+  };
 
   const pictureRef = useRef<HTMLInputElement>(null);
 
   const handleImageClick = () => {
-    if (!userForm.urlPicture) {
+    if (!userForm.url) {
       pictureRef.current!.click();
     }
   };
@@ -54,10 +54,10 @@ const SignIn = () => {
   const [isShown, setIsShown] = useState(false);
   const [preview, setPreview] = useState(false);
 
-  const { user, setUser } = useUser();
+  const { setUser } = useUser();
 
   // const [fullname, setfullname] = useState<User["fullname"]>("");
-  // const [urlPicture, setUrlPicture] = useState<User["urlPicture"]>("");
+  // const [urlPicture, setUrlPicture] = useState<User["url"]>("");
 
   const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
@@ -66,7 +66,7 @@ const SignIn = () => {
     // setUrlPicture(URL.createObjectURL(event.target.files[0]));
     setUserForm({
       ...userForm,
-      urlPicture: URL.createObjectURL(event.target.files[0]),
+      url: URL.createObjectURL(event.target.files[0]),
     });
   };
 
@@ -74,7 +74,6 @@ const SignIn = () => {
     event.preventDefault();
     setUser(userForm);
   };
-  console.log(user)
 
   return (
     <div className="font-primary mt-[42px] w-[1263px] m-auto">
@@ -86,8 +85,8 @@ const SignIn = () => {
             onMouseLeave={() => setIsShown(false)}
             onClick={handleImageClick}
           >
-            {userForm.urlPicture ? (
-              <img src={userForm.urlPicture} alt="" />
+            {userForm.url ? (
+              <img src={userForm.url} alt="" />
             ) : (
               <img src={image_upload} alt="" />
             )}
@@ -98,7 +97,7 @@ const SignIn = () => {
               accept="image/*"
               onChange={setPictureHandler}
             />
-            {isShown && userForm.urlPicture && (
+            {isShown && userForm.url && (
               <div className="absolute w-[150px] h-[150px] rounded-full bg-eighth text-3xl">
                 <div className="flex justify-between px-[30px] items-center w-[150px] h-[150px] t-[10px] text-white">
                   <RiDeleteBin7Line
@@ -106,7 +105,7 @@ const SignIn = () => {
                     onClick={() =>
                       setUserForm({
                         ...userForm,
-                        urlPicture: "",
+                        url: "",
                       })
                     }
                   />
@@ -127,7 +126,7 @@ const SignIn = () => {
         >
           <div className="relative flex justify-center items-center bg-white w-[452px] h-[424px] rounded-[8px]">
             <div className="w-[434px] h-[404px] flex justify-center items-center">
-              <img src={userForm.urlPicture} alt="" />
+              <img src={userForm.url} alt="" />
             </div>
             <img
               src={image_close}
