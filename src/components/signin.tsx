@@ -56,14 +56,10 @@ const SignIn = () => {
 
   const { setUser } = useUser();
 
-  // const [fullname, setfullname] = useState<User["fullname"]>("");
-  // const [urlPicture, setUrlPicture] = useState<User["url"]>("");
-
   const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       return;
     }
-    // setUrlPicture(URL.createObjectURL(event.target.files[0]));
     setUserForm({
       ...userForm,
       url: URL.createObjectURL(event.target.files[0]),
