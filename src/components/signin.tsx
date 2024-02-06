@@ -29,12 +29,19 @@ const SignIn = () => {
     zipcode: 0,
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
       ...userForm,
-      [e.target.name]: e.target.value,
+      [event.target.name]: event.target.value,
     });
   };
+
+  const handleTextArea = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setUserForm({
+      ...userForm,
+      address: event.target.value,
+    });
+  }
 
   const pictureRef = useRef<HTMLInputElement>(null);
 
@@ -271,7 +278,7 @@ const SignIn = () => {
               className="rounded-[4px] border-[1px] pl-[12px] text-lg border-sixth py-[9px] h-[150px]"
               placeholder="Enter Address"
               name="address"
-              onChange={handleChange}
+              onChange={handleTextArea}
             ></textarea>
           </div>
 
