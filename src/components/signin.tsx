@@ -1,7 +1,6 @@
 import image_mail from "../assets/mail.png";
 import image_pass from "../assets/pass.png";
 import image_see from "../assets/show.png";
-import image_toggle from "../assets/toggle.png";
 import image_close from "../assets/close.png";
 import image_upload from "../assets/pic.png";
 import "./signin.css";
@@ -13,10 +12,34 @@ import { useUser } from "../context/UserContext";
 import { User } from "../type/type";
 
 const SignIn = () => {
+  const [userForm, setUserForm] = useState<User>({
+    urlPicture: "",
+    email: "",
+    password: "",
+    companyName: "",
+    taxID: 0,
+    fullname: "",
+    country: "",
+    phoneNumber: 0,
+    website: "",
+    address: "",
+    state: "",
+    subDistrict: "",
+    city: "",
+    zipcode: 0,
+  });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserForm({
+      ...userForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   const pictureRef = useRef<HTMLInputElement>(null);
 
   const handleImageClick = () => {
-    if (!urlPicture) {
+    if (!userForm.urlPicture) {
       pictureRef.current!.click();
     }
   };
@@ -24,33 +47,27 @@ const SignIn = () => {
   const [isShown, setIsShown] = useState(false);
   const [preview, setPreview] = useState(false);
 
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
 
-  const [fullname, setfullname] = useState<User["name"]>("");
-  const [urlPicture, setUrlPicture] = useState<User["url"]>("");
+  // const [fullname, setfullname] = useState<User["fullname"]>("");
+  // const [urlPicture, setUrlPicture] = useState<User["urlPicture"]>("");
 
-  const setNameinputHanndler = (event: ChangeEvent<HTMLInputElement>) => {
-    setfullname(event.target.value);
-  };
-
-  const setPictureInputHandler = (event: ChangeEvent<HTMLInputElement>) => {
+  const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       return;
     }
-    setUrlPicture(URL.createObjectURL(event.target.files[0]));
+    // setUrlPicture(URL.createObjectURL(event.target.files[0]));
+    setUserForm({
+      ...userForm,
+      urlPicture: URL.createObjectURL(event.target.files[0]),
+    });
   };
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (!fullname && !urlPicture) {
-      alert("Pleace Input Fullname and Picture");
-      return;
-    }
-    setUser({
-      name: fullname,
-      url: urlPicture,
-    });
+    setUser(userForm);
   };
+  console.log(user)
 
   return (
     <div className="font-primary mt-[42px] w-[1263px] m-auto">
@@ -62,8 +79,8 @@ const SignIn = () => {
             onMouseLeave={() => setIsShown(false)}
             onClick={handleImageClick}
           >
-            {urlPicture ? (
-              <img src={urlPicture} alt="" className="" />
+            {userForm.urlPicture ? (
+              <img src={userForm.urlPicture} alt="" />
             ) : (
               <img src={image_upload} alt="" />
             )}
@@ -72,14 +89,19 @@ const SignIn = () => {
               ref={pictureRef}
               className="hidden"
               accept="image/*"
-              onChange={setPictureInputHandler}
+              onChange={setPictureHandler}
             />
-            {isShown && urlPicture && (
+            {isShown && userForm.urlPicture && (
               <div className="absolute w-[150px] h-[150px] rounded-full bg-eighth text-3xl">
                 <div className="flex justify-between px-[30px] items-center w-[150px] h-[150px] t-[10px] text-white">
                   <RiDeleteBin7Line
                     className="cursor-pointer"
-                    onClick={() => setUrlPicture("")}
+                    onClick={() =>
+                      setUserForm({
+                        ...userForm,
+                        urlPicture: "",
+                      })
+                    }
                   />
                   <MdOutlineRemoveRedEye
                     onClick={() => setPreview((prev) => (prev ? false : true))}
@@ -98,7 +120,7 @@ const SignIn = () => {
         >
           <div className="relative flex justify-center items-center bg-white w-[452px] h-[424px] rounded-[8px]">
             <div className="w-[434px] h-[404px] flex justify-center items-center">
-              <img src={urlPicture} alt="" />
+              <img src={userForm.urlPicture} alt="" />
             </div>
             <img
               src={image_close}
@@ -111,13 +133,13 @@ const SignIn = () => {
 
         <div className="grid grid-cols-3 gap-[24px]">
           <div className="relative grid gap-[6px]">
-            <label htmlFor="email" className="">
-              Email
-            </label>
+            <label htmlFor="email">Email</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[48px] text-lg border-sixth shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]"
               type="email"
               placeholder="Enter your Email"
+              name="email"
+              onChange={handleChange}
             />
             <img
               src={image_mail}
@@ -132,6 +154,8 @@ const SignIn = () => {
               type="password"
               placeholder="Enter your password"
               className="rounded-[4px] border-[1px] h-[44px] pl-[44px] text-lg border-sixth shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]"
+              name="password"
+              onChange={handleChange}
             />
             <img
               src={image_pass}
@@ -171,196 +195,128 @@ const SignIn = () => {
 
         <div className="grid grid-cols-3 gap-[24px]">
           <div className="grid mt-[8px] gap-[6px]">
-            <label htmlFor="companyname" className="">
-              Company Name
-            </label>
+            <label htmlFor="companyname">Company Name</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
               type="text"
               placeholder="Enter company name"
+              name="companyName"
+              onChange={handleChange}
             />
           </div>
 
           <div className="grid mt-[8px] gap-[6px]">
-            <label htmlFor="taxid" className="">
-              Tax ID
-            </label>
+            <label htmlFor="taxid">Tax ID</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
               type="text"
               placeholder="Enter Tax ID"
+              name="taxID"
+              onChange={handleChange}
             />
           </div>
 
           <div className="grid mt-[8px] gap-[6px]">
-            <label htmlFor="fullname" className="">
-              Full Name
-            </label>
+            <label htmlFor="fullname">Full Name</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
               type="text"
               placeholder="Enter Full name"
-              value={fullname}
-              onChange={setNameinputHanndler}
+              name="fullname"
+              onChange={handleChange}
             />
           </div>
 
           <div className="relative grid mt-[8px] gap-[6px]">
-            <label htmlFor="country" className="">
-              Country
-            </label>
-            <select
+            <label htmlFor="country">Country</label>
+            <input
+              className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
+              type="text"
+              placeholder="Enter Country"
               name="country"
-              id=""
-              className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg"
-            >
-              <option value="thailand" selected>
-                Thailand
-              </option>
-              <option value="thailand">TEST 1</option>s
-              <option value="thailand">TEST 2</option>
-            </select>
-            <img
-              src={image_toggle}
-              alt=""
-              className="absolute top-[50px] right-[19px]"
+              onChange={handleChange}
             />
-          </div>
-
-          <div className="relative grid mt-[8px] gap-[6px]">
-            <label htmlFor="phone" className="">
-              Phone Number
-            </label>
-            <div className="flex justify-between">
-              <select
-                name="phone"
-                id=""
-                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg w-[93px]"
-              >
-                <option value="thailand" selected>
-                  +66
-                </option>
-                <option value="thailand">TEST 1</option>
-                <option value="thailand">TEST 2</option>
-              </select>
-              <img
-                src={image_toggle}
-                alt=""
-                className="absolute top-[50px] left-[64px]"
-              />
-              <input
-                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth w-[259px]"
-                type="text"
-                placeholder="Enter Phone number"
-              />
-            </div>
           </div>
 
           <div className="grid mt-[8px] gap-[6px]">
-            <label htmlFor="website" className="">
-              Website
-            </label>
+            <label htmlFor="phonenumber">Phone Number</label>
+            <input
+              className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
+              type="text"
+              placeholder="Enter Phone number"
+              name="phoneNumber"
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="grid mt-[8px] gap-[6px]">
+            <label htmlFor="website">Website</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
               type="text"
               placeholder="Enter website"
+              name="website"
+              onChange={handleChange}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-[1fr_2.05fr] gap-[24px] mt-[24px]">
           <div className="flex flex-col mt-[8px] gap-[6px]">
-            <label htmlFor="website" className="">
-              Website
-            </label>
+            <label htmlFor="website">Address</label>
             <textarea
-              name=""
               id=""
               cols={30}
               rows={4}
               className="rounded-[4px] border-[1px] pl-[12px] text-lg border-sixth py-[9px] h-[150px]"
               placeholder="Enter Address"
+              name="address"
+              onChange={handleChange}
             ></textarea>
           </div>
 
           <div className="grid grid-cols-2 gap-[24px]">
             <div className="relative grid mt-[8px] gap-[6px]">
-              <label htmlFor="country" className="">
-                State/Province
-              </label>
-              <select
+              <label htmlFor="state">State/Province</label>
+              <input
+                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
+                type="text"
+                placeholder="Enter State/Provine"
                 name="state"
-                id=""
-                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg text-seventh"
-              >
-                <option value="" disabled selected>
-                  Choose Province
-                </option>
-                <option value="thailand">TEST 1</option>
-                <option value="thailand">TEST 2</option>
-                <option value="thailand">TEST 3</option>
-              </select>
-              <img
-                src={image_toggle}
-                alt=""
-                className="absolute top-[50px] right-[19px]"
+                onChange={handleChange}
               />
             </div>
 
             <div className="relative grid mt-[8px] gap-[6px]">
-              <label htmlFor="country" className="">
-                Sub-District
-              </label>
-              <select
-                name="sub-district"
-                id=""
-                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg text-seventh"
-              >
-                <option value="" disabled selected>
-                  Choose Sub-District
-                </option>
-                <option value="thailand">TEST 1</option>
-                <option value="thailand">TEST 2</option>
-                <option value="thailand">TEST 3</option>
-              </select>
-              <img
-                src={image_toggle}
-                alt=""
-                className="absolute top-[50px] right-[19px]"
+              <label htmlFor="subDistrict">Sub-District</label>
+              <input
+                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
+                type="text"
+                placeholder="Enter Sub-District"
+                name="subDistrict"
+                onChange={handleChange}
               />
             </div>
 
             <div className="relative grid mt-[8px] gap-[6px]">
-              <label htmlFor="country" className="">
-                City/District
-              </label>
-              <select
+              <label htmlFor="City">City/District</label>
+              <input
+                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
+                type="text"
+                placeholder="Enter City/District"
                 name="city"
-                id=""
-                className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg text-seventh"
-              >
-                <option value="" disabled selected>
-                  Choose District
-                </option>
-                <option value="thailand">TEST 1</option>
-                <option value="thailand">TEST 2</option>
-                <option value="thailand">TEST 3</option>
-              </select>
-              <img
-                src={image_toggle}
-                alt=""
-                className="absolute top-[50px] right-[19px]"
+                onChange={handleChange}
               />
             </div>
 
             <div className="grid mt-[8px] gap-[6px]">
-              <label htmlFor="zipcode" className="">
-                Zip Code
-              </label>
+              <label htmlFor="zipcode">Zip Code</label>
               <input
                 className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
                 type="text"
                 placeholder="Enter Zip Code"
+                name="zipcode"
+                onChange={handleChange}
               />
             </div>
           </div>

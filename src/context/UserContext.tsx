@@ -5,8 +5,20 @@ export const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: PropsWithChildren<{}>) => {
   const [user, setUser] = useState<User>({
-    name: "",
     url: "",
+    email: "",
+    password: "",
+    companyName: "",
+    taxID: 0,
+    fullname: "",
+    country: "",
+    phoneNumber: 0,
+    website: "",
+    address: "",
+    state: "",
+    subDistrict: "",
+    city: "",
+    zipcode: 0,
   });
 
   return (
