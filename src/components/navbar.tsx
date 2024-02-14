@@ -6,13 +6,14 @@ import image_login from "../assets/login.png";
 const NavBar = () => {
   const { user, setUser } = useUser();
 
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState<boolean>(false);
 
   const handleClick = () => {
     setUser({
       url: "",
       email: "",
       password: "",
+      confirmPass: "",
       companyName: "",
       taxID: 0,
       fullname: "",

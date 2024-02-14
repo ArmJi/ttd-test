@@ -9,13 +9,14 @@ import { RiDeleteBin7Line } from "react-icons/ri";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { User } from "../type/type";
+import { User, FormError } from "../type/type";
 
 const SignIn = () => {
   const [userForm, setUserForm] = useState<User>({
     url: "",
     email: "",
     password: "",
+    confirmPass: "",
     companyName: "",
     taxID: 0,
     fullname: "",
@@ -29,11 +30,115 @@ const SignIn = () => {
     zipcode: 0,
   });
 
+  const [formError, setFormError] = useState<FormError>({
+    url: "",
+    email: "",
+    password: "",
+    confirmPass: "",
+    companyName: "",
+    taxID: "",
+    fullname: "",
+    country: "",
+    phoneNumber: "",
+    website: "",
+    address: "",
+    state: "",
+    subDistrict: "",
+    city: "",
+    zipcode: "",
+  });
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
       ...userForm,
       [event.target.name]: event.target.value,
     });
+    if (!event.target.value) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Required",
+      });
+    } else {
+      setFormError({
+        ...formError,
+        [event.target.name]: "",
+      });
+    }
+  };
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserForm({
+      ...userForm,
+      [event.target.name]: event.target.value,
+    });
+
+    if (!event.target.value) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Required",
+      });
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(event.target.value)
+    ) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Invalid email address",
+      });
+    } else {
+      setFormError({
+        ...formError,
+        [event.target.name]: "",
+      });
+    }
+  };
+
+  const handlePassChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserForm({
+      ...userForm,
+      [event.target.name]: event.target.value,
+    });
+
+    if (!event.target.value) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Required",
+      });
+    } else if (!/.{8,}/.test(event.target.value)) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Minimum of 8 characters",
+      });
+    } else if (
+      !/(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])/.test(event.target.value)
+    ) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Uppercase, lowercase letters and one number",
+      });
+    } else {
+      setFormError({
+        ...formError,
+        [event.target.name]: "",
+      });
+    }
+  };
+
+  const handleConfirmPassChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setUserForm({
+      ...userForm,
+      [event.target.name]: event.target.value,
+    });
+    if (event.target.value !== userForm.password) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Password and Confirm should the same",
+      });
+    } else {
+      setFormError({
+        ...formError,
+        [event.target.name]: "",
+      });
+    }
   };
 
   const handleTextArea = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -41,6 +146,17 @@ const SignIn = () => {
       ...userForm,
       address: event.target.value,
     });
+    if (!event.target.value) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Required",
+      });
+    } else {
+      setFormError({
+        ...formError,
+        [event.target.name]: "",
+      });
+    }
   };
 
   const pictureRef = useRef<HTMLInputElement>(null);
@@ -51,24 +167,61 @@ const SignIn = () => {
     }
   };
 
-  const [isShown, setIsShown] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [isShown, setIsShown] = useState<boolean>(false);
+  const [preview, setPreview] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
 
   const { setUser } = useUser();
 
   const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
+      setFormError({
+        ...formError,
+        [event.target.name]: "Required",
+      });
       return;
     }
-    setUserForm({
-      ...userForm,
-      url: URL.createObjectURL(event.target.files[0]),
-    });
+    const reader = new FileReader();
+
+    reader.readAsDataURL(event.target.files[0]);
+
+    reader.onload = () => {
+      const readerURL = reader.result;
+      if (typeof readerURL === "string") {
+        setUserForm({
+          ...userForm,
+          url: readerURL,
+        });
+      }
+    };
   };
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setUser(userForm);
+    if (
+      userForm.url &&
+      userForm.email &&
+      userForm.password &&
+      userForm.confirmPass &&
+      userForm.confirmPass &&
+      userForm.companyName &&
+      userForm.taxID &&
+      userForm.fullname &&
+      userForm.country &&
+      userForm.phoneNumber &&
+      userForm.website &&
+      userForm.address &&
+      userForm.state &&
+      userForm.city &&
+      userForm.zipcode
+    ) {
+      setUser(userForm);
+      location.href = "/";
+    }
+    else{
+      alert("Pleace fill out the information completely")
+    }
   };
 
   return (
@@ -76,7 +229,7 @@ const SignIn = () => {
       <form action="" className="mx-auto w-[1128px]">
         <div className="flex justify-center mb-[24px]">
           <div
-            className="flex justify-center items-center w-[150px] h-[150px] border-[1px] border-third rounded-full overflow-hidden"
+            className="flex justify-center items-center w-[150px] h-[150px] border-[1px] border-third rounded-full overflow-hidden cursor-pointer"
             onMouseEnter={() => setIsShown(true)}
             onMouseLeave={() => setIsShown(false)}
             onClick={handleImageClick}
@@ -88,6 +241,7 @@ const SignIn = () => {
             )}
             <input
               type="file"
+              name="url"
               ref={pictureRef}
               className="hidden"
               accept="image/*"
@@ -98,12 +252,13 @@ const SignIn = () => {
                 <div className="flex justify-between px-[30px] items-center w-[150px] h-[150px] t-[10px] text-white">
                   <RiDeleteBin7Line
                     className="cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
                       setUserForm({
                         ...userForm,
                         url: "",
-                      })
-                    }
+                      });
+                      pictureRef.current!.value = "";
+                    }}
                   />
                   <MdOutlineRemoveRedEye
                     onClick={() => setPreview((prev) => (prev ? false : true))}
@@ -141,23 +296,26 @@ const SignIn = () => {
               type="email"
               placeholder="Enter your Email"
               name="email"
-              onChange={handleChange}
+              onChange={handleEmailChange}
             />
             <img
               src={image_mail}
               alt=""
               className="absolute top-[41px] left-[14px]"
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.email}
+            </p>
           </div>
 
           <div className="relative grid gap-[6px]">
             <label htmlFor="password">Password</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               className="rounded-[4px] border-[1px] h-[44px] pl-[44px] text-lg border-sixth shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]"
               name="password"
-              onChange={handleChange}
+              onChange={handlePassChange}
             />
             <img
               src={image_pass}
@@ -167,16 +325,22 @@ const SignIn = () => {
             <img
               src={image_see}
               alt=""
-              className="absolute top-[46px] right-[28px]"
+              className="absolute top-[46px] right-[28px] cursor-pointer"
+              onClick={() => setShowPassword((prev) => !prev)}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.password}
+            </p>
           </div>
 
           <div className="relative grid gap-[6px]">
-            <label htmlFor="password">Confirmed Password</label>
+            <label htmlFor="confirmPass">Confirmed Password</label>
             <input
-              type="password"
+              type={showConfirmPass ? "text" : "password"}
               placeholder="Enter your password"
               className="rounded-[4px] border-[1px] h-[44px] pl-[44px] text-lg border-sixth shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]"
+              name="confirmPass"
+              onChange={handleConfirmPassChange}
             />
             <img
               src={image_pass}
@@ -186,8 +350,12 @@ const SignIn = () => {
             <img
               src={image_see}
               alt=""
-              className="absolute top-[46px] right-[28px]"
+              className="absolute top-[46px] right-[28px] cursor-pointer"
+              onClick={() => setShowConfirmPass((prev) => !prev)}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.confirmPass}
+            </p>
           </div>
         </div>
 
@@ -196,7 +364,7 @@ const SignIn = () => {
         <div className="font-semibold text-xl text-fourth">Information</div>
 
         <div className="grid grid-cols-3 gap-[24px]">
-          <div className="grid mt-[8px] gap-[6px]">
+          <div className="grid mt-[8px] gap-[6px] relative">
             <label htmlFor="companyname">Company Name</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
@@ -205,9 +373,12 @@ const SignIn = () => {
               name="companyName"
               onChange={handleChange}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.companyName}
+            </p>
           </div>
 
-          <div className="grid mt-[8px] gap-[6px]">
+          <div className="grid mt-[8px] gap-[6px] relative">
             <label htmlFor="taxid">Tax ID</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
@@ -216,9 +387,12 @@ const SignIn = () => {
               name="taxID"
               onChange={handleChange}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.taxID}
+            </p>
           </div>
 
-          <div className="grid mt-[8px] gap-[6px]">
+          <div className="grid mt-[8px] gap-[6px] relative">
             <label htmlFor="fullname">Full Name</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
@@ -227,6 +401,9 @@ const SignIn = () => {
               name="fullname"
               onChange={handleChange}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.fullname}
+            </p>
           </div>
 
           <div className="relative grid mt-[8px] gap-[6px]">
@@ -238,9 +415,12 @@ const SignIn = () => {
               name="country"
               onChange={handleChange}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.country}
+            </p>
           </div>
 
-          <div className="grid mt-[8px] gap-[6px]">
+          <div className="relative grid mt-[8px] gap-[6px]">
             <label htmlFor="phonenumber">Phone Number</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
@@ -249,9 +429,12 @@ const SignIn = () => {
               name="phoneNumber"
               onChange={handleChange}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.phoneNumber}
+            </p>
           </div>
 
-          <div className="grid mt-[8px] gap-[6px]">
+          <div className="relative grid mt-[8px] gap-[6px]">
             <label htmlFor="website">Website</label>
             <input
               className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
@@ -260,11 +443,14 @@ const SignIn = () => {
               name="website"
               onChange={handleChange}
             />
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.website}
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-[1fr_2.05fr] gap-[24px] mt-[24px]">
-          <div className="flex flex-col mt-[8px] gap-[6px]">
+          <div className="relative flex flex-col mt-[8px] gap-[6px]">
             <label htmlFor="website">Address</label>
             <textarea
               id=""
@@ -275,6 +461,9 @@ const SignIn = () => {
               name="address"
               onChange={handleTextArea}
             ></textarea>
+            <p className="text-red-500 absolute bottom-[-25px] text-sm">
+              {formError.address}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-[24px]">
@@ -287,6 +476,9 @@ const SignIn = () => {
                 name="state"
                 onChange={handleChange}
               />
+              <p className="text-red-500 absolute bottom-[-25px] text-sm">
+                {formError.state}
+              </p>
             </div>
 
             <div className="relative grid mt-[8px] gap-[6px]">
@@ -298,6 +490,9 @@ const SignIn = () => {
                 name="subDistrict"
                 onChange={handleChange}
               />
+              <p className="text-red-500 absolute bottom-[-25px] text-sm">
+                {formError.subDistrict}
+              </p>
             </div>
 
             <div className="relative grid mt-[8px] gap-[6px]">
@@ -309,9 +504,12 @@ const SignIn = () => {
                 name="city"
                 onChange={handleChange}
               />
+              <p className="text-red-500 absolute bottom-[-25px] text-sm">
+                {formError.city}
+              </p>
             </div>
 
-            <div className="grid mt-[8px] gap-[6px]">
+            <div className="relative grid mt-[8px] gap-[6px]">
               <label htmlFor="zipcode">Zip Code</label>
               <input
                 className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth"
@@ -320,6 +518,9 @@ const SignIn = () => {
                 name="zipcode"
                 onChange={handleChange}
               />
+              <p className="text-red-500 absolute bottom-[-25px] text-sm">
+                {formError.zipcode}
+              </p>
             </div>
           </div>
         </div>
