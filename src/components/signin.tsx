@@ -218,9 +218,8 @@ const SignIn = () => {
     ) {
       setUser(userForm);
       location.href = "/";
-    }
-    else{
-      alert("Pleace fill out the information completely")
+    } else {
+      alert("Pleace fill out the information completely");
     }
   };
 
