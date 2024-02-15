@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { User, FormError } from "../type/type";
 
+// STATE FOR DATA OF FORM
 const SignIn = () => {
   const [userForm, setUserForm] = useState<User>({
     url: "",
@@ -30,6 +31,7 @@ const SignIn = () => {
     zipcode: 0,
   });
 
+  // STATE FOR INFORMATION ERROR OF FORM
   const [formError, setFormError] = useState<FormError>({
     url: "",
     email: "",
@@ -48,6 +50,8 @@ const SignIn = () => {
     zipcode: "",
   });
 
+  // FUNCTION EVENT ON CHANGE OF FORM INPUT
+  // ON CHANGE OF SIMPLE INPUT
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
       ...userForm,
@@ -66,6 +70,7 @@ const SignIn = () => {
     }
   };
 
+  // ON CHANGE OF EMAIL INPUT
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
       ...userForm,
@@ -92,6 +97,7 @@ const SignIn = () => {
     }
   };
 
+  // ON CHANGE OF PASS INPUT
   const handlePassChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
       ...userForm,
@@ -123,6 +129,7 @@ const SignIn = () => {
     }
   };
 
+  // ON CHANGE OF CONFIRM PASS INPUT
   const handleConfirmPassChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
       ...userForm,
@@ -141,6 +148,7 @@ const SignIn = () => {
     }
   };
 
+  // ON CHANGE OF TEXT AREA INPUT
   const handleTextArea = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setUserForm({
       ...userForm,
@@ -159,6 +167,7 @@ const SignIn = () => {
     }
   };
 
+  // FUNCTION UPLOAD PICTURE
   const pictureRef = useRef<HTMLInputElement>(null);
 
   const handleImageClick = () => {
@@ -197,6 +206,7 @@ const SignIn = () => {
     };
   };
 
+  // FUNCTION SUBMIT FORM
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (
