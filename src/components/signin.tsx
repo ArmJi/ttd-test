@@ -11,11 +11,12 @@ import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { User, FormError } from "../type/type";
 
-// USE CONTEXT
-const { setUser } = useUser();
 
-// STATE FOR DATA OF FORM
 const SignIn = () => {
+  // USE CONTEXT
+  const { setUser } = useUser();
+
+  // STATE FOR DATA OF FORM
   const [userForm, setUserForm] = useState<User>({
     url: "",
     email: "",
@@ -100,7 +101,7 @@ const SignIn = () => {
     }
   };
 
-  // STATE FOR SHOW OF PASS AND CONFIRM PASS
+  // STATE FOR SHOW HIDDEN OF PASS
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
 
@@ -183,6 +184,9 @@ const SignIn = () => {
     }
   };
 
+  const [isShown, setIsShown] = useState<boolean>(false);
+  const [preview, setPreview] = useState<boolean>(false);
+
   const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       setFormError({
@@ -205,9 +209,6 @@ const SignIn = () => {
       }
     };
   };
-
-  const [isShown, setIsShown] = useState<boolean>(false);
-  const [preview, setPreview] = useState<boolean>(false);
 
   // FUNCTION SUBMIT FORM
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
