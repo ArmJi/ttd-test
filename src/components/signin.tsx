@@ -189,10 +189,6 @@ const SignIn = () => {
 
   const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
-      setFormError({
-        ...formError,
-        [event.target.name]: "Required",
-      });
       return;
     }
     const reader = new FileReader();
