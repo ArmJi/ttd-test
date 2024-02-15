@@ -11,6 +11,9 @@ import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { User, FormError } from "../type/type";
 
+// USE CONTEXT
+const { setUser } = useUser();
+
 // STATE FOR DATA OF FORM
 const SignIn = () => {
   const [userForm, setUserForm] = useState<User>({
@@ -97,6 +100,10 @@ const SignIn = () => {
     }
   };
 
+  // STATE FOR SHOW OF PASS AND CONFIRM PASS
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
+
   // ON CHANGE OF PASS INPUT
   const handlePassChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUserForm({
@@ -176,13 +183,6 @@ const SignIn = () => {
     }
   };
 
-  const [isShown, setIsShown] = useState<boolean>(false);
-  const [preview, setPreview] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
-
-  const { setUser } = useUser();
-
   const setPictureHandler = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       setFormError({
@@ -205,6 +205,9 @@ const SignIn = () => {
       }
     };
   };
+
+  const [isShown, setIsShown] = useState<boolean>(false);
+  const [preview, setPreview] = useState<boolean>(false);
 
   // FUNCTION SUBMIT FORM
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
