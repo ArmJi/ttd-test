@@ -36,11 +36,9 @@ function Status({status, callBack} : Status) {
                 setIsOpen(false)
             }
         }
-
         if (isOpen) {
             window.addEventListener('mousedown', handleClickOutside)
         }
-
         return () => {
             window.removeEventListener('mousedown', handleClickOutside)
         }
