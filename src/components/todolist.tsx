@@ -103,7 +103,7 @@ function TodoList() {
     useEffect(() => {
         if (datePicker.current) {
             flatpickr(datePicker.current, {
-                onChange: function (selectedDates, dateStr, instance) {
+                onChange: function (selectedDates) {
                     setFormData(prev => ({
                         ...prev,
                         date: selectedDates[0].toLocaleDateString("sv-SE")
