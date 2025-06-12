@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 import './layout-test.css'
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import Status from "./status";
+import image_close from "../assets/close.png";
 
 // ================== type ==================
 export interface category {
@@ -13,6 +14,7 @@ interface TodoItem {
     title: string;
     date: string;
     status: string;
+    id: string;
 };
 
 interface Form {
@@ -25,32 +27,15 @@ function TodoList() {
     const [data, setData] = useState<TodoItem[]>([]);
     const [formData, setFormData] = useState<Form>({ title: '', date: '' })
     const [error, setError] = useState<Form>({ title: '', date: '' })
-    const [mockData, setMockData] = useState([
-        {
-            id: "1",
-            title: 'test 1',
-            date: '2012-06-12',
-            status: 'todo'
-        },
-        {
-            id: "2",
-            title: 'test 2',
-            date: '2024-07-30',
-            status: 'in_progress'
-        },
-        {
-            id: "3",
-            title: 'test 3',
-            date: '2021-02-30',
-            status: 'in_progress'
-        },
-        {
-            id: "4",
-            title: 'test 4',
-            date: '2014-07-23',
-            status: 'done'
-        },
-    ])
+    const LOCAL_STORAGE_KEY = "todoListData";
+    const [mockData, setMockData] = useState(() => {
+        const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        try {
+            return JSON.parse(storedData || "[]")
+        } catch {
+            return []
+        }
+    })
 
     const category = [
         {
@@ -72,6 +57,17 @@ function TodoList() {
     ]
 
     // ================== handle submit form ==================
+
+    function generateID() {
+        let current = new Date();
+        let year = String(current.getFullYear()).padStart(2, '0');
+        let date = String(current.getDate()).padStart(2, '0');
+        let month = String(current.getMonth()).padStart(2, '0');
+        let hour = String(current.getHours()).padStart(2, '0');
+        let minute = String(current.getMinutes()).padStart(2, '0');
+        let sec = String(current.getSeconds()).padStart(2, '0');
+        return 'td' + year + month + date + hour + minute + sec
+    }
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         let errors: Form = { title: '', date: '' }
@@ -89,24 +85,15 @@ function TodoList() {
             return
         }
         setError({ title: '', date: '' })
-        // test post data
-        setMockData(prev => [
-            ...prev,
-            {
-                id: "",
-                title: formData.title,
-                date: formData.date,
-                status: "todo"
-            }
-        ])
-        setData(prev => [
-            ...prev,
-            {
-                id: "",
-                title: formData.title,
-                date: formData.date,
-                status: "todo"
 
+        // test post data
+        setMockData((prev : TodoItem[]) => [
+            ...prev,
+            {
+                id: generateID(),
+                title: formData.title,
+                date: formData.date,
+                status: "todo"
             }
         ])
     }
@@ -171,37 +158,47 @@ function TodoList() {
     }
 
     const [sort, setSort] = useState(false)
-    useEffect(() => {
-        fetchData().then(res => {
-            setData(res)
-        })
-    }, [sort])
 
-    useEffect(() => {
-        fetchData().then(res => {
-            setData(res)
-        })
-    }, [filter])
+    const [keyword, setKeyword] = useState('')
 
-    // ================== simulation fetch ==================
-    function handleStatus(value: category) {
-
+    function keywordFilter(event: ChangeEvent<HTMLInputElement>) {
+        let value = event.target.value
+        setKeyword(value)
     }
 
+    // ================== handle status update ==================
+    function handleStatus(value: category, id: string) {
+        let findIndex = mockData.findIndex((item : TodoItem) => item.id == id)
+        let tmp = [...mockData];
+        tmp[findIndex] = {
+            ...tmp[findIndex],
+            status: value.value
+        }
+        setMockData(tmp)
+    }
+
+    function handleDelete(id: string) {
+        let newDate = [...mockData].filter(item => item.id !== id);
+        setMockData(newDate)
+    }
 
     // ================== simulation fetch ==================
     async function fetchData() {
         return new Promise<TodoItem[]>((resolve) => {
-            let res: TodoItem[] = mockData
+            let res: TodoItem[] = [...mockData]
             if (sort) {
-                res = mockData.sort((a, b) => {
+                console.log(sort);
+                res = res.sort((a, b) => {
                     let dateA = new Date(a.date);
                     let dateB = new Date(b.date);
                     return dateB.getTime() - dateA.getTime()
                 })
             }
             if (filter) {
-                res = mockData.filter(item => item.status === filter)
+                res = res.filter(item => item.status === filter)
+            }
+            if (keyword) {
+                res = res.filter(item => item.title.toLowerCase().includes(keyword.toLowerCase()))
             }
             resolve(res)
         })
@@ -209,9 +206,14 @@ function TodoList() {
 
     useEffect(() => {
         fetchData().then(res => {
-            setData(res)
-        })
-    }, [])
+            setData(res);
+        });
+    }, [filter, sort, keyword, mockData]);
+
+    useEffect(() => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mockData));
+        console.log("Data saved to localStorage:", mockData);
+    }, [mockData]);
 
     return (
         <>
@@ -237,13 +239,13 @@ function TodoList() {
                         </div>
                         <button type="submit" className="submit_btn">Submit</button>
                     </div>
-                    {/* <div className="col grid grid-cols-[1fr_200px] gap-[20px] items-end">
-                        <div className="wrap_input relative grid gap-[6px]">
-                            <label htmlFor="date" className="text-xl">Keyword</label>
-                            <input type="text" className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth" name="keyword" />
-                        </div>
-                    </div> */}
                 </form>
+                <div className="col grid gap-[20px] mt-[20px] items-end">
+                    <div className="wrap_input relative grid gap-[6px]">
+                        <label htmlFor="date" className="text-xl">Keyword</label>
+                        <input type="text" onChange={(e) => keywordFilter(e)} className="rounded-[4px] border-[1px] h-[44px] pl-[12px] text-lg border-sixth" name="keyword" />
+                    </div>
+                </div>
                 <div className="wrap_filter">
                     <button className="filter_date" onClick={() => setSort(true)}>Latest Date</button>
                     <div className="wrap_dropdown" ref={dropdown}>
@@ -270,10 +272,13 @@ function TodoList() {
                             data.length > 0 &&
                             data.map((item, index) => {
                                 return (
-                                    <div className="wrap_list" key={item.title + index}>
-                                        <div className="tr title text-xl"><span>{item.title}</span></div>
+                                    <div className="wrap_list" key={item.date + index}>
+                                        <div className="tr title text-xl">
+                                            <img src={image_close} onClick={() => handleDelete(item.id)} className="delete" alt="delete" />
+                                            <span>{item.title}</span>
+                                        </div>
                                         <div className="tr date text-xl"><span>{item.date}</span></div>
-                                        <Status status={item.status} callBack={(value) => {handleStatus(value)}} />
+                                        <Status status={item.status} id={item.id} callBack={(value, id) => { handleStatus(value, id) }} />
                                     </div>
                                 )
                             })

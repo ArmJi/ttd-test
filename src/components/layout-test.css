@@ -12,8 +12,9 @@
     margin-bottom: 50px;
 }
 
-.form {
-
+.delete{
+    margin-right: 30px;
+    cursor: pointer;
 }
 .wrap_filter{
     display: flex;
@@ -118,6 +119,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.tr.title{
+    display: flex;
+    justify-content: start;
+    padding-left: 20px;
 }
 
 .tr.status{

@@ -3,10 +3,11 @@ import { category } from "./todolist";
 
 interface Status {
     status: string,
-    callBack: (value: category) => void
+    callBack: (value: category, id: string) => void,
+    id: string
 }
 
-function Status({status, callBack} : Status) {
+function Status({status, callBack, id} : Status) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownStatus = useRef<HTMLDivElement>(null);
     const [selected, setSelected] = useState<category | undefined>();
@@ -49,21 +50,21 @@ function Status({status, callBack} : Status) {
         setSelected(findValue)
     }, [])
 
-    function setDropdown(value: category) {
+    function setDropdown(value: category, id: string) {
         setSelected(value)
-        callBack(value)
+        callBack(value, id)
         setIsOpen(false)
     }
 
     return (
         <div className="tr status" >
-            <div className={`wrap_dropdown ${selected?.value}`} ref={dropdownStatus}>
-                <div className={`label_status`} onClick={handleFilter}>{selected?.title}</div>
+            <div className={`wrap_dropdown ${selected?.value}`} onClick={handleFilter} ref={dropdownStatus}>
+                <div className={`label_status`}>{selected?.title}</div>
                 <div className={`wrap_dd ${isOpen ? "active" : ""}`} >
                     {
                         category.map((item, index) => {
                             return (
-                                <div className="list_dd" key={index} onClick={() => setDropdown(item)}>{item.title}</div>
+                                <div className="list_dd" key={index} onClick={() => setDropdown(item, id)}>{item.title}</div>
                             )
                         })
                     }
